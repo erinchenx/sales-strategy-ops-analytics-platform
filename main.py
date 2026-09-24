@@ -63,7 +63,7 @@ TYPE_DESC_MAP = {
 
 # ── 人员画像分类函数（9种画像，基于战场偏好重心坐标）
 def get_persona(x, y, radius=0.25):
-    """根据加权重心坐标 (x,y) 判定人员画像类型。x: 财力偏向, y: 转化效率"""
+    """根据加权重心坐标 (x,y) 判定人员画像类型。x: 财力偏向, y: 个人业绩水平"""
     dist = math.sqrt(x**2 + y**2)
     if dist <= radius:
         return {"label":"平衡稳健型","icon":"⚪",
@@ -82,12 +82,12 @@ def get_persona(x, y, radius=0.25):
                 "color":"#F39C12"}
     elif abs(y) <= radius and x > radius:
         return {"label":"顺势收益型","icon":"➡️",
-                "definition":"业绩重心高度集中于高财力区域，转化效率接近均值水平，其产出与区域资源禀赋强相关，尚未形成独立于环境之外的差异化竞争能力。",
+                "definition":"业绩重心高度集中于高财力区域，个人业绩水平接近全司中位水平，其产出与区域资源禀赋强相关，尚未形成独立于环境之外的差异化竞争能力。",
                 "management":["重点监控其负责区域的财政健康度，一旦区域出现下行，需提前介入而非等待业绩滑落","创造跨环境展业机会，观察脱离资源红利后的真实能力水位"],
                 "color":"#82E0AA"}
     elif abs(y) <= radius and x < -radius:
         return {"label":"逆境生存型","icon":"⬅️",
-                "definition":"业绩重心集中于低财力区域，在资源匮乏的环境下维持接近均值的转化效率，具备一定的逆境作战韧性，但尚未形成非对称的竞争优势。",
+                "definition":"业绩重心集中于低财力区域，在资源匮乏的环境下维持接近全司中位的个人业绩水平，具备一定的逆境作战韧性，但尚未形成非对称的竞争优势。",
                 "management":["适合派往竞争对手渗透薄弱、资源条件较差的市场做初期开拓","与开疆拓土型人才的区别在于效率，需重点观察其在同类艰苦区域的效率提升空间",'注意心理状态管理，长期深耕艰苦区域易产生倦怠，需配合激励机制'],
                 "color":"#5DADE2"}
     # 四象限复合区
@@ -103,13 +103,13 @@ def get_persona(x, y, radius=0.25):
                 "color":"#2E7D32"}
     elif x > 0 and y < 0:
         return {"label":"资源错配型","icon":"🔴",
-                "definition":'业绩重心集中于高财力区域，但转化效率持续低于均值，呈现"占据优质资源却未能有效转化"的状态，是资源配置效率最低的人员类型。',
+                "definition":'业绩重心集中于高财力区域，但个人业绩水平持续低于全司中位，呈现"占据优质资源却未能有效转化"的状态，是资源配置效率最低的人员类型。',
                 "management":["立即排查获客、跟进、促成各环节，重点核查是否存在客户资源虚占、过程动作缺失等问题",'评估人岗匹配度：区分"能力不足"与"动力不足"，前者需辅导，后者需激励或警示',
                 '设定短期改善目标（建议1个季度），若无明显改善则考虑区域资源重新分配','此类人员是管理资源投入优先级很高的对象'],
                 "color":"#E74C3C"}
     else:
         return {"label":"低位蛰伏型","icon":"🟤",
-                "definition":"业绩重心集中于低财力区域，转化效率低于均值，在资源有限的环境下维持低频产出，整体处于低位运行状态。",
+                "definition":"业绩重心集中于低财力区域，个人业绩水平低于全司中位，在资源有限的环境下维持低频产出，整体处于低位运行状态。",
                 "management":["若为新人：重点看学习速度和主动性，给予明确的短期目标和反馈机制","老员工：评估是否已触及个人天花板，若连续多期无改善则考虑岗位调整",'管理精力应聚焦在有改善潜力的个体，避免平均分配注意力'],
                 "color":"#6D4C41"}
 
@@ -807,7 +807,7 @@ if module=="全司业务概览":
                     bgcolor="rgba(255,255,255,.92)", bordercolor="#E0E0E0", borderwidth=1, itemsizing="constant"),
     }))
     st.plotly_chart(fig_mkt,use_container_width=True)
-
+    st.caption("圆形气泡大小由当年全司在该省的业绩总额决定。业绩总额越大，圆形气泡越大。")
     # ── 市场人员作战画像分析
     sec("市场人员作战画像分析")
     st.markdown(
@@ -1035,7 +1035,7 @@ if module=="全司业务概览":
         fig_attr.add_vline(x=fis_mid_s, line_dash="dash", line_color="#90A4AE", line_width=1,
                            annotation_text=f"财力中位 {fis_mid_s:.0f}亿", annotation_position="top")
         fig_attr.add_hline(y=_py_median, line_dash="dash", line_color="#90A4AE", line_width=1,
-                           annotation_text=f"个人业绩中位 {_py_median:.0f}万", annotation_position="right")
+                           annotation_text=f"全司个人业绩中位 {_py_median:.0f}万", annotation_position="right")
         fig_attr.update_layout(
             xaxis_title="加权平均地方财力（亿元）", yaxis_title="个人业绩总额（万元）",
             xaxis=dict(range=[0, _px_max]), yaxis=dict(range=[0, _py_max]),
@@ -1060,11 +1060,11 @@ if module=="全司业务概览":
         st.markdown(
             f"<div style='font-size:.78rem;color:#666;background:#F9F8F6;border-radius:6px;"
             f"padding:8px 14px;margin-top:-8px;line-height:1.9'>"
-            f"<b>圆形气泡</b>：圆形气泡大小由该省当年债券发行数量决定。&emsp;"
+            f"<b>灰色圆形气泡</b>：圆形气泡大小由该省当年债券发行数量决定。&emsp;"
             f"<b>菱形气泡</b>：<span style='font-weight:600'>{person_filter}</span> 个人在该省份的业绩总额，"
             f"气泡越大=个人业绩越多，颜色与所属象限一致，紧贴圆形气泡下方。&emsp;"
             f"<b>橙色三角形 ▲</b>：综合战场偏好指数的加权重心，"
-            f"代表该人员整体展业模式在财力-效率坐标系中的位置，悬停查看完整画像分析。"
+            f"代表该人员整体展业模式在财力-业绩坐标系中的位置，悬停查看完整画像分析。"
             f"</div>",
             unsafe_allow_html=True)
     st.markdown("")
